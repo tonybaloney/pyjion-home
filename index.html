@@ -1,1 +1,186 @@
-Hello world
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <meta content="" name="description">
+    <meta content="" name="author">
+
+    <title>Pyjion - A Python JIT Compiler</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Theme CSS -->
+    <link href="css/clean-blog.min.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/styles/default.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.2/highlight.min.js"></script>
+    <script src='https://cdn.plot.ly/plotly-2.4.2.min.js'></script>
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button class="navbar-toggle" data-target="#bs-example-navbar-collapse-1" data-toggle="collapse" type="button">
+                <span class="sr-only">Toggle navigation</span>
+                Menu <i class="fa fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="#about">Overview</a>
+                </li>
+                <li>
+                    <a href="#install">Install</a>
+                </li>
+                <li>
+                    <a href="https://docs.trypyjion.com/">Documentation</a>
+                </li>
+                <li>
+                    <a href="#benchmarks">Benchmarks</a>
+                </li>
+                <li>
+                    <a href="https://live.trypyjion.com/">Try it Out</a>
+                </li>
+                <li>
+                    <a href="https://github.com/tonybaloney/pyjion"><i class="fa fa-github"> </i> Source Code</a>
+                </li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+<!-- Page Header -->
+<!-- Set your background image for this header on the line below. -->
+<header class="intro-header" style="background-color: cornflowerblue;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="site-heading">
+                    <h1><img src="img/pyjion_logo.png" width="300px"></h1>
+                    <hr class="small">
+                    <span class="subheading">A drop-in JIT Compiler for Python 3.10</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 col-lg-offset-2 col-md-10">
+            <h1><a id="about"></a>What is Pyjion?</h1>
+            <p class="post-subtitle">
+                Pyjion is a drop-in JIT Compiler for Python 3.10. It can be pip installed into a CPython 3.10 installation on Linux, Mac OS X, or Windows.
+            </p>
+            <p>Pyjion can make your Python code execute faster without any code changes.</p>
+            <p>
+                Pyjion compiles Python code into native machine code, which can be executed directly by the JIT compiler on X86_64 and ARM64 platforms.
+            </p>
+            <p>
+                Pyjion comes with a builtin disassembler and profiling optimizer.
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <h1><a id="install"></a>Installation</h1>
+            <div class="post-preview">
+                Pyjion requires:
+                <ul>
+                    <li><a href="python.org/download">CPython 3.10</a></li>
+                    
+                    <li><a href="https://dotnet.microsoft.com/download/dotnet/6.0">.NET 6</a></li>
+                </ul>
+            </div>
+            <div class="post-preview">
+                After following the installation steps, pyjion is a python module that you can import a Python 3.10 environment:
+            
+                <pre><code class="language-bash">python -m pip install pyjion</code></pre>
+
+                After importing pyjion, enable the JIT using the enable function:
+
+                <pre><code class="language-python">import pyjion; pyjion.enable()</code></pre>
+                
+                Any Python code you define or import after enabling pyjion will be JIT compiled. You don't need to execute functions in any special API, it's completely transparent:
+                
+                <pre><code class="language-python">
+>>> def half(x):
+...    return x/2
+>>> half(2)
+1.0
+                </code></pre>
+                
+                You can also execute Pyjion against any script or module:
+                
+                <pre><code class="language-python">pyjion my_script.py</code></pre>
+                Or, for an existing Python module:
+                
+                <pre><code class="language-python">pyjion -m calendar</code></pre>
+
+                That's it! For the full API, checkout the <a href="https://docs.trypyjion.com">documentation</a>.
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <h1><a id="install"></a>Benchmarks</h1>
+            <div class="post-preview" id="benchmarkData"></div>
+            <div class="post-preview">
+                Data is on a Linux X86_64 machine. Benchmark scripts are in the Pyjion source repo. Some benchmarks have a slow max/mean value because the time includes JIT-compiling large libraries like Pandas.
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Footer -->
+<footer>
+</footer>
+
+<!-- jQuery -->
+<script src="vendor/jquery/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+
+<script>hljs.initHighlightingOnLoad();</script>
+<script>
+    var trace1 = {
+  x: ['spectralnorm', 'chaos', 'floatmath_micro', 'intmath_micro', 'bigintmath_micro', 'function_call_micro', 'type_call_micro', 'builtin_call_micro', 'pandas', 'delta_blue', 'nqueens', 'nbody', 'float', 'fannkuch'],
+  y: [1.880, 2.001, 0.017, 0.016, 0.028, 0.157, 0.065, 0.210, 0.502, 0.258, 1.703, 3.238, 1.427, 8.362],
+  name: 'Python 3.10',
+  type: 'bar'
+};
+
+var trace2 = {
+  x: ['spectralnorm', 'chaos', 'floatmath_micro', 'intmath_micro', 'bigintmath_micro', 'function_call_micro', 'type_call_micro', 'builtin_call_micro', 'pandas', 'delta_blue', 'nqueens', 'nbody', 'float', 'fannkuch'],
+  y: [1.97, 1.78, 0.001, 0.001, 0.03, 0.15, 0.06, 0.13, 0.53, 0.27, 1.17, 1.34, 1.12, 4.42],
+  name: 'Python 3.10 + Pyjion',
+  type: 'bar'
+};
+
+var data = [trace1, trace2];
+
+var layout = {barmode: 'group'};
+
+Plotly.newPlot('benchmarkData', data, layout);
+</script>
+</body>
+
+</html>
